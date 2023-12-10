@@ -138,6 +138,14 @@ public class Field {
         System.out.println("\nTotalMines: "+totalMines);
     }
 
+    public int getWidth() {
+        return this.WIDTH;
+    }
+
+    public int getHeight() {
+        return this.HEIGHT;
+    }
+
     public static void main(String[] args) {
         Field field = new Field();
         field.printField();
