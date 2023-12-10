@@ -30,6 +30,10 @@ public class Field {
         }
     }
 
+    public MineBox[][] getField() {
+        return this.field;
+    }
+
     private void populateMines() {
         Random rand = new Random();
         int minesLeft = MINES;
