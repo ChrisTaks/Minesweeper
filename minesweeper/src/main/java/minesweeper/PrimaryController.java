@@ -2,20 +2,30 @@ package minesweeper;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.ResourceBundle;
+
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseButton;
 import javafx.scene.layout.*;
 import minesweeper.source_code.*;
 
 public class PrimaryController implements Initializable{
     private Field mf;
+    private MineBox[][] field;
+    private ArrayList<int[]> firstClickBoxes = new ArrayList<int[]>();
+    private int width = 30;
+    private int height = 16;
+    private ObservableList<StackPane> OLTiles = FXCollections.observableArrayList();
     @FXML
     private GridPane mineFieldGrid = new GridPane();
-    @FXML
-    private ImageView tile;
     @FXML
     private Image tileImage;
     @FXML
@@ -36,31 +46,69 @@ public class PrimaryController implements Initializable{
     private Image eight;
     @FXML
     private Image mine;
+    @FXML
+    private Image cover;
+    @FXML
+    private Image flag;
+    @FXML
+    private Pane mainPane;
+    @FXML
+    private Button newGame;
+    @FXML
+    private Pane gameOverPane;
 
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        mf = new Field();
         setImages();
-        buildGrid();
+        buildNewGame();
+        newGame = new Button();
+        newGame.setText("New Game");
+        mainPane.getChildren().add(newGame);
+        mineFieldGrid.relocate(0, 30);
+        newGame.setOnAction(event -> {
+            setNewGame();
+        });
     }
 
-    private void buildGrid() {
-        MineBox[][] field = mf.getField();
-        for (int i = 0; i < mf.getHeight(); i++) {
-            for (int j = 0; j < mf.getWidth(); j++) {
-                buildMineBox(field[i][j]);
-                mineFieldGrid.add(buildMineBox(field[i][j]), i, j);
+    private void buildNewGame() {
+        mainPane.getChildren().remove(gameOverPane);
+        buildFacade();
+    }
+    
+    private void buildMineGrid() {
+        OLTiles.clear();
+        mf = new Field(firstClickBoxes);
+        field = mf.getField();
+        mf.printField();
+        for (int h = 0; h < mf.getHeight(); h++) {
+            for (int w = 0; w < mf.getWidth(); w++) {
+                OLTiles.add(buildMineBox(field[h][w]));
+                //mineFieldGrid.add(buildMineBox(field[i][j]), j, i);
+            }
+        }
+    }
+
+    private void drawMineGrid() {
+        mineFieldGrid.getChildren().clear();
+        for (int h = 0; h < mf.getHeight(); h++) {
+            for (int w = 0; w < mf.getWidth(); w++) {
+                int index = ((mf.getWidth() * h) + w);
+                mineFieldGrid.add(buildMineBox(field[h][w]), w, h);
             }
         }
     }
 
     private StackPane buildMineBox(MineBox mb) {
         StackPane mineBox = new StackPane();
+        ImageView tile = new ImageView();
         tile.setImage(tileImage);
         mineBox.getChildren().add(tile);
         ImageView number = new ImageView();
         switch(mb.getMineNumber()) {
+            case 0:
+                number.setImage(tileImage);
+                break;
             case 1:
                 number.setImage(one);
                 break;
@@ -85,13 +133,168 @@ public class PrimaryController implements Initializable{
             case 8:
                 number.setImage(eight);
                 break;
-            default:
+            case 9:
                 number.setImage(mine);
                 break;
         }
-        number.setImage(one);
         mineBox.getChildren().add(number);
+        ImageView tileCover = new ImageView();
+        tileCover.setImage(cover);
+        if (mb.getIsCovered()) {
+            mineBox.getChildren().add(tileCover);
+        }
+        ImageView clickCover = new ImageView(tileImage);
+        ImageView flagCover = new ImageView(flag);
+        mineBox.setOnMousePressed(event -> {
+            if (event.getButton() == MouseButton.PRIMARY) {
+                if (mb.getIsCovered() && !mb.getIsFlagged()) {
+                    mineBox.getChildren().add(clickCover);
+                }
+            }
+            if (event.getButton() == MouseButton.SECONDARY) {
+                if (mb.getIsCovered()) {
+                    if (mb.getIsFlagged()) {
+                        mineBox.getChildren().remove(flagCover);
+                        mb.setIsFlagged(false);
+                    } else {
+                        mineBox.getChildren().add(flagCover);
+                        mb.setIsFlagged(true);
+                    }
+                }
+            }
+        });
+        mineBox.setOnMouseReleased(event -> {
+            if (event.getButton() == MouseButton.PRIMARY) {
+                if (!mb.getIsFlagged() && mb.getIsCovered()) {
+                    mineBox.getChildren().remove(clickCover);
+                    mineBox.getChildren().remove(tileCover);
+                    mb.setIsCovered(false);
+                    if (mb.getIsMine()) {
+                        // GAME OVER
+                        setGameOver();
+                    }
+                }
+                if (mb.getMineNumber() == 0) {
+                    // uncover tiles
+                    ArrayList<MineBox> unc = mf.getSurroundingTiles(mb);
+                    mb.setIsCovered(false);
+                    unCover(unc);
+                }
+            }
+        });
+
         return mineBox;
+    }
+
+    private void unCover(ArrayList<MineBox> boxList) {
+        for (MineBox mb : boxList) {
+            if (mb.getIsCovered()) {
+                if (mb.getMineNumber() == 0) {
+                    mb.setIsCovered(false);
+                    ArrayList<MineBox> unc = mf.getSurroundingTiles(mb);
+                    unCover(unc);
+                } else {
+                    mb.setIsCovered(false);
+                }
+            }
+        }
+        drawMineGrid();
+    }
+
+    private void unCover1(MineBox mb) {
+        mb.setIsCovered(false);
+        ArrayList<MineBox> unc = mf.getSurroundingTiles(mb);
+
+    }
+
+    private void setGameOver() {
+        gameOverPane = new Pane();
+        mainPane.getChildren().add(gameOverPane);
+        gameOverPane.setLayoutX(0);
+        gameOverPane.setLayoutY(30);
+        gameOverPane.setPrefWidth(940);
+        gameOverPane.setPrefHeight(620);
+
+        for (int i = 0; i < mf.getHeight(); i++) {
+            for (int j = 0; j < mf.getWidth(); j++) {
+                if (field[i][j].getIsMine()) {
+
+                }
+            }
+        }
+    }
+
+    private void buildFacade() {
+        for (int h = 0; h < height; h++) {
+            for (int w = 0; w < width; w++) {
+                mineFieldGrid.add(buildFacadeCoverBox(h, w), w, h);
+            }
+        }
+    }
+
+    private ImageView buildFacadeCoverBox(int h, int w) {
+        ImageView fcb = new ImageView(cover);
+        fcb.setOnMousePressed(event -> {
+            if (event.getButton() == MouseButton.PRIMARY) {
+                fcb.setImage(eight);
+            }
+        });
+        fcb.setOnMouseReleased(event -> {
+            if (event.getButton() == MouseButton.PRIMARY) {
+                firstClickBoxes = getSurroundingTileIndexes(h, w);
+                mineFieldGrid.getChildren().remove(fcb);
+                buildMineGrid();
+                drawMineGrid();
+            }
+        });
+        return fcb;
+    }
+
+    private ArrayList<int[]> getSurroundingTileIndexes(int h, int w) {
+        ArrayList<int[]> boxes = new ArrayList<int[]>();
+        int topRow = h-1;
+        int bottomRow = h+1;
+        int left = w-1;
+        int right = w+1;
+        int[] click = {h, w};
+        boxes.add(click);
+        if (topRow >= 0) {
+            int[] one = {topRow, w};
+            boxes.add(one);
+            if (left >= 0) {
+                int[] zero = {topRow, left};
+                boxes.add(zero);
+            }
+            if (right < width) {
+                int[] two = {topRow, right};
+                boxes.add(two);
+            }
+        }
+        // bottow rom
+        if (bottomRow < height) {
+            int[] five = {bottomRow, w};
+            boxes.add(five);
+            if (left >= 0) {
+                int[] six = {bottomRow, left};
+                boxes.add(six);
+            }
+            if (right < width) {
+                int[] four = {bottomRow, right};
+                boxes.add(four);
+            }
+                    
+        }
+        // middle row
+        if (left >= 0) {
+            int[] seven = {h, left};
+            boxes.add(seven);
+        }
+        if (right < width) {
+            int[] three = {h, right};
+            boxes.add(three);
+        }
+        return boxes;
+
     }
 
     private void setImages() {
@@ -105,7 +308,12 @@ public class PrimaryController implements Initializable{
         seven = new Image(getClass().getResourceAsStream("/images/7.png"));
         eight = new Image(getClass().getResourceAsStream("/images/8.png"));
         mine = new Image(getClass().getResourceAsStream("/images/mine.png"));
+        cover = new Image(getClass().getResourceAsStream("/images/cover.png"));
+        flag = new Image(getClass().getResourceAsStream("/images/flag.png"));
+    }
 
+    private void setNewGame() {
+        buildNewGame();
     }
 
     @FXML

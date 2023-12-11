@@ -12,9 +12,9 @@ public class Field {
     private int fieldTotal = 0;
 
 
-    public Field() {
+    public Field(ArrayList<int[]> fcb) {
         setField();
-        populateMines();
+        populateMines(fcb);
         setMineNumber();
     }
 
@@ -24,7 +24,7 @@ public class Field {
         // populate field
         for (int i = 0; i < HEIGHT; i++) {
             for (int j = 0; j < WIDTH; j++) {
-                field[i][j] = new MineBox(fieldTotal);
+                field[i][j] = new MineBox(fieldTotal, j, i);
                 fieldTotal++;
             }
         }
@@ -34,7 +34,7 @@ public class Field {
         return this.field;
     }
 
-    private void populateMines() {
+    private void populateMines(ArrayList<int[]> fcb) {
         Random rand = new Random();
         int minesLeft = MINES;
         ArrayList<Boolean> tempField = new ArrayList<Boolean>();
@@ -58,6 +58,14 @@ public class Field {
                         //System.out.println("DUPE FOUND");
                     }
                 }
+                for (int j = 0; j < fcb.size(); j++) {
+                    System.out.println("FCB: "+(((fcb.get(j)[1]) * WIDTH) + (fcb.get(j)[0]))+" Mine: "+mine);
+                    if (mine == ((fcb.get(j)[1] * WIDTH) + fcb.get(j)[0])) {
+                        mineDuplicate = true;
+                        System.out.println("Mine equals first click box!");
+                    }
+                }
+                System.out.println("");
             }
             mineList.add(mine);
             System.out.println("MINE SET: "+mine);
@@ -66,13 +74,12 @@ public class Field {
         } 
         //System.out.println("TempFIeld size: "+tempField.size());  
 
-        //WIDTH * i + j;
-        for (int i = 0; i < HEIGHT; i++) {
-            for (int j = 0; j < WIDTH; j++) {
+        for (int h = 0; h < HEIGHT; h++) {
+            for (int w = 0; w < WIDTH; w++) {
                 //System.out.println(tempField.get(WIDTH * i + j));
-                if (tempField.get((HEIGHT * j) + i)) {
+                if (tempField.get((WIDTH * h) + w)) {
                     //System.out.println("index "+HEIGHT * j + i+" is a mine");
-                    field[i][j].setMine(true);
+                    field[h][w].setMine(true);
                 }
             }
         }
@@ -127,12 +134,51 @@ public class Field {
         }
     }
 
+    public ArrayList<MineBox> getSurroundingTiles(MineBox mb) {
+        ArrayList<MineBox> boxes = new ArrayList<MineBox>();
+        int w = mb.getW();
+        int h = mb.getH();
+        int topRow = h-1;
+        int bottomRow = h+1;
+        int left = w-1;
+        int right = h+1;
 
-    private void printField() {
+        if (topRow >= 0) {
+            boxes.add(field[topRow][w]);
+            if (left >= 0) {
+                boxes.add(field[topRow][left]);
+            }
+            if (right < WIDTH) {
+                boxes.add(field[topRow][right]);
+            }
+        }
+        // bottow rom
+        if (bottomRow < HEIGHT) {
+            boxes.add(field[bottomRow][w]);
+            if (left >= 0) {
+                 boxes.add(field[bottomRow][left]);
+            }
+            if (right < WIDTH) {
+                 boxes.add(field[bottomRow][right]);
+            }
+                    
+        }
+        // middle row
+        if (left >= 0) {
+            boxes.add(field[h][left]);
+        }
+        if (right < WIDTH) {
+            boxes.add(field[h][right]);
+        }
+        return boxes;
+    }
+
+
+    public void printField() {
         int totalMines = 0;
         for (int i = 0; i < HEIGHT; i++) {
             for (int j = 0; j < WIDTH; j++) {
-                System.out.print(field[i][j]);
+                System.out.print(field[i][j]+" ");
                 if (field[i][j].getIsMine()) {
                     totalMines++;
                 }
@@ -150,10 +196,8 @@ public class Field {
         return this.HEIGHT;
     }
 
-    public static void main(String[] args) {
-        Field field = new Field();
-        field.printField();
-    } 
-
-
+    // public static void main(String[] args) {
+    //     Field field = new Field();
+    //     field.printField();
+    // } 
 }
