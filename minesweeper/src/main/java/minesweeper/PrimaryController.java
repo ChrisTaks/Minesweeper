@@ -23,6 +23,8 @@ public class PrimaryController implements Initializable{
     private ArrayList<int[]> firstClickBoxes = new ArrayList<int[]>();
     private int width = 30;
     private int height = 16;
+    private boolean leftClick = false;
+    private boolean rightClick = false;
     private ObservableList<StackPane> OLTiles = FXCollections.observableArrayList();
     @FXML
     private GridPane mineFieldGrid = new GridPane();
@@ -146,12 +148,22 @@ public class PrimaryController implements Initializable{
         ImageView clickCover = new ImageView(tileImage);
         ImageView flagCover = new ImageView(flag);
         mineBox.setOnMousePressed(event -> {
+            // both buttons pressed
+            if (leftClick && event.getButton() == MouseButton.SECONDARY) {
+                System.out.println("BOTH BUTTONS CLICKED");
+                ArrayList<MineBox> boxes = mf.getSurroundingTiles(mb);
+                for (MineBox box : boxes) {
+                    box.setIsDoubleClicked(true);
+                }
+            }
+
             if (event.getButton() == MouseButton.PRIMARY) {
+                leftClick = true;
                 if (mb.getIsCovered() && !mb.getIsFlagged()) {
                     mineBox.getChildren().add(clickCover);
                 }
             }
-            if (event.getButton() == MouseButton.SECONDARY) {
+            if (!leftClick && event.getButton() == MouseButton.SECONDARY) {
                 if (mb.getIsCovered()) {
                     if (mb.getIsFlagged()) {
                         mineBox.getChildren().remove(flagCover);
@@ -165,6 +177,7 @@ public class PrimaryController implements Initializable{
         });
         mineBox.setOnMouseReleased(event -> {
             if (event.getButton() == MouseButton.PRIMARY) {
+                leftClick = false;
                 if (!mb.getIsFlagged() && mb.getIsCovered()) {
                     mineBox.getChildren().remove(clickCover);
                     mineBox.getChildren().remove(tileCover);
@@ -176,9 +189,8 @@ public class PrimaryController implements Initializable{
                 }
                 if (mb.getMineNumber() == 0) {
                     // uncover tiles
-                    ArrayList<MineBox> unc = mf.getSurroundingTiles(mb);
-                    mb.setIsCovered(false);
-                    unCover(unc);
+                    mf.unCoverEmptyBoxes(mb);
+                    drawMineGrid();
                 }
             }
         });
@@ -186,28 +198,9 @@ public class PrimaryController implements Initializable{
         return mineBox;
     }
 
-    private void unCover(ArrayList<MineBox> boxList) {
-        for (MineBox mb : boxList) {
-            if (mb.getIsCovered()) {
-                if (mb.getMineNumber() == 0) {
-                    mb.setIsCovered(false);
-                    ArrayList<MineBox> unc = mf.getSurroundingTiles(mb);
-                    unCover(unc);
-                } else {
-                    mb.setIsCovered(false);
-                }
-            }
-        }
-        drawMineGrid();
-    }
-
-    private void unCover1(MineBox mb) {
-        mb.setIsCovered(false);
-        ArrayList<MineBox> unc = mf.getSurroundingTiles(mb);
-
-    }
-
     private void setGameOver() {
+        mf.unCoverAllMines();
+        drawMineGrid();
         gameOverPane = new Pane();
         mainPane.getChildren().add(gameOverPane);
         gameOverPane.setLayoutX(0);
@@ -215,13 +208,6 @@ public class PrimaryController implements Initializable{
         gameOverPane.setPrefWidth(940);
         gameOverPane.setPrefHeight(620);
 
-        for (int i = 0; i < mf.getHeight(); i++) {
-            for (int j = 0; j < mf.getWidth(); j++) {
-                if (field[i][j].getIsMine()) {
-
-                }
-            }
-        }
     }
 
     private void buildFacade() {
@@ -236,21 +222,24 @@ public class PrimaryController implements Initializable{
         ImageView fcb = new ImageView(cover);
         fcb.setOnMousePressed(event -> {
             if (event.getButton() == MouseButton.PRIMARY) {
-                fcb.setImage(eight);
+                fcb.setImage(tileImage);
             }
         });
         fcb.setOnMouseReleased(event -> {
             if (event.getButton() == MouseButton.PRIMARY) {
-                firstClickBoxes = getSurroundingTileIndexes(h, w);
+                firstClickBoxes = getSurroundingTileIndexes(w, h);
                 mineFieldGrid.getChildren().remove(fcb);
                 buildMineGrid();
+                mf.unCoverEmptyBoxes(mf.getMineBox(h, w));
                 drawMineGrid();
             }
         });
         return fcb;
     }
 
-    private ArrayList<int[]> getSurroundingTileIndexes(int h, int w) {
+    private ArrayList<int[]> getSurroundingTileIndexes(int w, int h) {
+        System.out.println("H: "+h);
+        System.out.println("W: "+w);
         ArrayList<int[]> boxes = new ArrayList<int[]>();
         int topRow = h-1;
         int bottomRow = h+1;

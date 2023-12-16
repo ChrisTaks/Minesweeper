@@ -59,16 +59,16 @@ public class Field {
                     }
                 }
                 for (int j = 0; j < fcb.size(); j++) {
-                    System.out.println("FCB: "+(((fcb.get(j)[1]) * WIDTH) + (fcb.get(j)[0]))+" Mine: "+mine);
-                    if (mine == ((fcb.get(j)[1] * WIDTH) + fcb.get(j)[0])) {
+                    //System.out.println("FCB: "+(((fcb.get(j)[1]) * WIDTH) + (fcb.get(j)[0]))+" Mine: "+mine);
+                    if (mine == ((fcb.get(j)[0] * WIDTH) + fcb.get(j)[1])) {
                         mineDuplicate = true;
-                        System.out.println("Mine equals first click box!");
+                       // System.out.println("Mine equals first click box!");
                     }
                 }
-                System.out.println("");
+                //System.out.println("");
             }
             mineList.add(mine);
-            System.out.println("MINE SET: "+mine);
+            //System.out.println("MINE SET: "+mine);
             tempField.set(mine, true);
             //minesLeft--;
         } 
@@ -82,6 +82,10 @@ public class Field {
                     field[h][w].setMine(true);
                 }
             }
+        }
+        // Test print
+        for (int j = 0; j < fcb.size(); j++) {
+            System.out.println("FCB: "+(((fcb.get(j)[0]) * WIDTH) + (fcb.get(j)[1])));
         }
     }
 
@@ -141,7 +145,7 @@ public class Field {
         int topRow = h-1;
         int bottomRow = h+1;
         int left = w-1;
-        int right = h+1;
+        int right = w+1;
 
         if (topRow >= 0) {
             boxes.add(field[topRow][w]);
@@ -173,12 +177,49 @@ public class Field {
         return boxes;
     }
 
+    public void unCoverEmptyBoxes(MineBox origin) {
+        origin.setIsCovered(false);
+        ArrayList<MineBox> surroundingBoxes = getSurroundingTiles(origin);
+        for (MineBox mb : surroundingBoxes) {
+            if (mb.getIsFlagged()) {
+                return;
+            }
+            if (mb.getMineNumber() == 0 && !mb.getIsMine() && mb.getIsCovered()) {
+                mb.setIsCovered(false);
+                unCoverEmptyBoxes(mb);
+            }
+            if (!(mb.getMineNumber() == 0) && !mb.getIsMine()) {
+                mb.setIsCovered(false);
+            }
+        }
+    }
+
+    public void unCoverAllMines() {
+        for (int h = 0; h < HEIGHT; h++) {
+            for (int w = 0; w < WIDTH; w++) {
+                if(field[h][w].getIsMine()) {
+                    field[h][w].setIsCovered(false);
+                }
+            }
+        }
+    }
+
+    public MineBox getMineBox(int h, int w) {
+        return field[h][w];
+    }
+
 
     public void printField() {
         int totalMines = 0;
         for (int i = 0; i < HEIGHT; i++) {
             for (int j = 0; j < WIDTH; j++) {
-                System.out.print(field[i][j]+" ");
+                if(field[i][j].getIndex() < 10 && !field[i][j].getIsMine()) {
+                    System.out.print("00"+field[i][j]+" ");
+                } else if(field[i][j].getIndex() < 100 && !field[i][j].getIsMine()) {
+                    System.out.print("0"+field[i][j]+" ");
+                } else {
+                    System.out.print(field[i][j]+" ");
+                }
                 if (field[i][j].getIsMine()) {
                     totalMines++;
                 }

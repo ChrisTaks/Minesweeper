@@ -8,13 +8,15 @@ public class MineBox {
     private int mineNumber;
     private boolean isCovered;
     private boolean isFlagged;
+    private boolean isDoubleClicked;
     
     public MineBox(int n, int w, int h) {
+        setIsFlagged(false);
         setIndex(n);
         setW(w);
         setH(h);
         setIsCovered(true);
-        setIsFlagged(false);
+        setIsDoubleClicked(false);
     }
 
     private void setIndex(int n) {
@@ -42,7 +44,9 @@ public class MineBox {
     }
 
     public void setIsCovered(boolean bool) {
-        this.isCovered = bool;
+        if (!isFlagged) {
+            this.isCovered = bool;
+        }
     }
 
     public boolean getIsCovered() {
@@ -74,6 +78,14 @@ public class MineBox {
             return 9;    
         }
         return this.mineNumber;
+    }
+
+    public void setIsDoubleClicked(boolean bool) {
+        this.isDoubleClicked = bool;
+    }
+
+    public boolean getIsDoubleClicked() {
+        return this.isDoubleClicked;
     }
 
     public String toString() {
