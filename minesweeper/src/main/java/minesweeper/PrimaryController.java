@@ -86,7 +86,6 @@ public class PrimaryController implements Initializable{
         for (int h = 0; h < mf.getHeight(); h++) {
             for (int w = 0; w < mf.getWidth(); w++) {
                 OLTiles.add(buildMineBox(field[h][w]));
-                //mineFieldGrid.add(buildMineBox(field[i][j]), j, i);
             }
         }
     }
@@ -95,7 +94,6 @@ public class PrimaryController implements Initializable{
         mineFieldGrid.getChildren().clear();
         for (int h = 0; h < mf.getHeight(); h++) {
             for (int w = 0; w < mf.getWidth(); w++) {
-                int index = ((mf.getWidth() * h) + w);
                 mineFieldGrid.add(buildMineBox(field[h][w]), w, h);
             }
         }
@@ -103,8 +101,7 @@ public class PrimaryController implements Initializable{
 
     private StackPane buildMineBox(MineBox mb) {
         StackPane mineBox = new StackPane();
-        ImageView tile = new ImageView();
-        tile.setImage(tileImage);
+        ImageView tile = new ImageView(tileImage);
         mineBox.getChildren().add(tile);
         ImageView number = new ImageView();
         switch(mb.getMineNumber()) {
@@ -140,13 +137,15 @@ public class PrimaryController implements Initializable{
                 break;
         }
         mineBox.getChildren().add(number);
-        ImageView tileCover = new ImageView();
-        tileCover.setImage(cover);
+        ImageView tileCover = new ImageView(cover);
         if (mb.getIsCovered()) {
             mineBox.getChildren().add(tileCover);
         }
-        ImageView clickCover = new ImageView(tileImage);
         ImageView flagCover = new ImageView(flag);
+        if (mb.getIsFlagged()) {
+            mineBox.getChildren().add(flagCover);
+        }
+        ImageView clickCover = new ImageView(tileImage);
         mineBox.setOnMousePressed(event -> {
             // both buttons pressed
             if (leftClick && event.getButton() == MouseButton.SECONDARY) {
@@ -155,6 +154,8 @@ public class PrimaryController implements Initializable{
                 for (MineBox box : boxes) {
                     box.setIsDoubleClicked(true);
                 }
+                drawMineGrid();
+                leftClick = false;
             }
 
             if (event.getButton() == MouseButton.PRIMARY) {
@@ -177,6 +178,7 @@ public class PrimaryController implements Initializable{
         });
         mineBox.setOnMouseReleased(event -> {
             if (event.getButton() == MouseButton.PRIMARY) {
+                System.out.println("leftclick release");
                 leftClick = false;
                 if (!mb.getIsFlagged() && mb.getIsCovered()) {
                     mineBox.getChildren().remove(clickCover);
