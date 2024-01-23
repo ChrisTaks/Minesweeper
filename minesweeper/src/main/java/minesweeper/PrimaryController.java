@@ -25,6 +25,7 @@ public class PrimaryController implements Initializable{
     private int height = 16;
     private boolean leftClick = false;
     private boolean rightClick = false;
+    private boolean doubleClick = false;
     private ObservableList<StackPane> OLTiles = FXCollections.observableArrayList();
     @FXML
     private GridPane mineFieldGrid = new GridPane();
@@ -145,11 +146,16 @@ public class PrimaryController implements Initializable{
         if (mb.getIsFlagged()) {
             mineBox.getChildren().add(flagCover);
         }
+        ImageView doubleClickCover = new ImageView(tileImage);
+        if (mb.getIsDoubleClicked() && !mb.getIsFlagged()) {
+            mineBox.getChildren().add(doubleClickCover);
+        }
         ImageView clickCover = new ImageView(tileImage);
         mineBox.setOnMousePressed(event -> {
             // both buttons pressed
             if (leftClick && event.getButton() == MouseButton.SECONDARY) {
                 System.out.println("BOTH BUTTONS CLICKED");
+                doubleClick = true;
                 ArrayList<MineBox> boxes = mf.getSurroundingTiles(mb);
                 for (MineBox box : boxes) {
                     box.setIsDoubleClicked(true);
@@ -164,7 +170,8 @@ public class PrimaryController implements Initializable{
                     mineBox.getChildren().add(clickCover);
                 }
             }
-            if (!leftClick && event.getButton() == MouseButton.SECONDARY) {
+            if (!doubleClick && event.getButton() == MouseButton.SECONDARY) {
+                System.out.println("DOUBLE CLICK RELEASE 2");
                 if (mb.getIsCovered()) {
                     if (mb.getIsFlagged()) {
                         mineBox.getChildren().remove(flagCover);
@@ -194,6 +201,9 @@ public class PrimaryController implements Initializable{
                     mf.unCoverEmptyBoxes(mb);
                     drawMineGrid();
                 }
+            }
+            if (doubleClick && event.getButton() == MouseButton.SECONDARY) {
+                System.out.println("DOUBLE CLICK RELEASE");
             }
         });
 
