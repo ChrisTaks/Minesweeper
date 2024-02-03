@@ -23,9 +23,6 @@ public class PrimaryController implements Initializable{
     private ArrayList<int[]> firstClickBoxes = new ArrayList<int[]>();
     private int width = 30;
     private int height = 16;
-    private boolean leftClick = false;
-    private boolean rightClick = false;
-    private boolean doubleClick = false;
     private ObservableList<StackPane> OLTiles = FXCollections.observableArrayList();
     @FXML
     private GridPane mineFieldGrid = new GridPane();
@@ -147,31 +144,34 @@ public class PrimaryController implements Initializable{
             mineBox.getChildren().add(flagCover);
         }
         ImageView doubleClickCover = new ImageView(tileImage);
-        if (mb.getIsDoubleClicked() && !mb.getIsFlagged()) {
+        if (mb.getIsDoubleClicked() && !mb.getIsFlagged() && mb.getIsCovered()) {
             mineBox.getChildren().add(doubleClickCover);
         }
         ImageView clickCover = new ImageView(tileImage);
         mineBox.setOnMousePressed(event -> {
-            // both buttons pressed
-            if (leftClick && event.getButton() == MouseButton.SECONDARY) {
-                System.out.println("BOTH BUTTONS CLICKED");
-                doubleClick = true;
+
+            // left click
+            if (event.getButton() == MouseButton.PRIMARY) {
+                System.out.println("left click");
+                if (mb.getIsCovered() && !mb.getIsFlagged()) {
+                    mineBox.getChildren().add(clickCover);
+                }
+            }
+
+            // middle click
+            if (event.getButton() == MouseButton.MIDDLE) {
+                System.out.println("middle click");
+                mb.setIsDoubleClicked(true);
                 ArrayList<MineBox> boxes = mf.getSurroundingTiles(mb);
                 for (MineBox box : boxes) {
                     box.setIsDoubleClicked(true);
                 }
                 drawMineGrid();
-                leftClick = false;
             }
 
-            if (event.getButton() == MouseButton.PRIMARY) {
-                leftClick = true;
-                if (mb.getIsCovered() && !mb.getIsFlagged()) {
-                    mineBox.getChildren().add(clickCover);
-                }
-            }
-            if (!doubleClick && event.getButton() == MouseButton.SECONDARY) {
-                System.out.println("DOUBLE CLICK RELEASE 2");
+            // right click
+            if (event.getButton() == MouseButton.SECONDARY) {
+                System.out.println("right click");
                 if (mb.getIsCovered()) {
                     if (mb.getIsFlagged()) {
                         mineBox.getChildren().remove(flagCover);
@@ -183,10 +183,11 @@ public class PrimaryController implements Initializable{
                 }
             }
         });
+
         mineBox.setOnMouseReleased(event -> {
+            // left click release
             if (event.getButton() == MouseButton.PRIMARY) {
                 System.out.println("leftclick release");
-                leftClick = false;
                 if (!mb.getIsFlagged() && mb.getIsCovered()) {
                     mineBox.getChildren().remove(clickCover);
                     mineBox.getChildren().remove(tileCover);
@@ -202,8 +203,40 @@ public class PrimaryController implements Initializable{
                     drawMineGrid();
                 }
             }
-            if (doubleClick && event.getButton() == MouseButton.SECONDARY) {
-                System.out.println("DOUBLE CLICK RELEASE");
+
+            // middle click release
+            if (event.getButton() == MouseButton.MIDDLE) {
+                System.out.println("middle click release");
+                int flaggedBoxes = 0;
+                mb.setIsDoubleClicked(false);
+                ArrayList<MineBox> boxes = mf.getSurroundingTiles(mb);
+                for (MineBox box : boxes) {
+                    if (box.getIsFlagged()) {
+                        ++flaggedBoxes;
+                    }
+                    box.setIsDoubleClicked(false);
+                }
+                if (flaggedBoxes == mb.getMineNumber() && mb.getMineNumber() != 0) {
+                    for (MineBox box : boxes) {
+                        if (!box.getIsFlagged() && box.getIsCovered()) {
+                            box.setIsCovered(false);
+                            if (box.getIsMine()) {
+                                // GAME OVER
+                                setGameOver();
+                            }
+                        }
+                        if (box.getMineNumber() == 0) {
+                            // uncover tiles
+                            mf.unCoverEmptyBoxes(box);
+                        }
+                    }
+                }
+                drawMineGrid();
+            }
+
+            // right click release
+            if (event.getButton() == MouseButton.SECONDARY) {
+                System.out.println("right click release");
             }
         });
 
