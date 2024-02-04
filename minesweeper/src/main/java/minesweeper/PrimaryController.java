@@ -21,9 +21,11 @@ public class PrimaryController implements Initializable{
     private Field mf;
     private MineBox[][] field;
     private ArrayList<int[]> firstClickBoxes = new ArrayList<int[]>();
-    private int width = 30;
-    private int height = 16;
+    private int width = 30; // og 30
+    private int height = 16; // og 16
     private ObservableList<StackPane> OLTiles = FXCollections.observableArrayList();
+    @FXML
+    private GridPane gameGrid = new GridPane();
     @FXML
     private GridPane mineFieldGrid = new GridPane();
     @FXML
@@ -51,6 +53,22 @@ public class PrimaryController implements Initializable{
     @FXML
     private Image flag;
     @FXML
+    private Image hPipe;
+    @FXML
+    private Image vPipe;
+    @FXML
+    private Image topLeftPipe;
+    @FXML
+    private Image topRightPipe;
+    @FXML
+    private Image middleLeftPipe;
+    @FXML
+    private Image middleRightPipe;
+    @FXML
+    private Image bottomLeftPipe;
+    @FXML
+    private Image bottomRightPipe;
+    @FXML
     private Pane mainPane;
     @FXML
     private Button newGame;
@@ -64,11 +82,50 @@ public class PrimaryController implements Initializable{
         buildNewGame();
         newGame = new Button();
         newGame.setText("New Game");
+        mainPane.getChildren().add(gameGrid);
         mainPane.getChildren().add(newGame);
-        mineFieldGrid.relocate(0, 30);
+        mainPane.getChildren().add(mineFieldGrid);
+        mineFieldGrid.relocate(19, 98); // (19*2)+(30*2)
+        gameGrid.relocate(0, 0);
         newGame.setOnAction(event -> {
             setNewGame();
         });
+
+        // build the game field
+        //very top row
+        gameGrid.add(new ImageView(topLeftPipe), 0, 0);
+        gameGrid.add(new ImageView(topRightPipe), width+1 , 0);
+        for (int w = 1; w < width+1; w++) {
+            // very top row
+            gameGrid.add(new ImageView(hPipe), w, 0);
+            // second row
+            gameGrid.add(new ImageView(hPipe), w, 3);
+            // bottom row
+            gameGrid.add(new ImageView(hPipe), w, height+4);
+        }
+        // vertical pipes around the console box
+        for (int h = 1; h < 3; h++) {
+            gameGrid.add(new ImageView(vPipe), 0, h);
+            gameGrid.add(new ImageView(vPipe), width+1, h);
+        }
+        // console box bottom corner pipes
+        gameGrid.add(new ImageView(middleLeftPipe), 0, 3);
+        gameGrid.add(new ImageView(middleRightPipe), width+1, 3);
+
+        // vertical pipes around the mineFieldGrid
+        for (int h = 0; h < height; h++) {
+            gameGrid.add(new ImageView(vPipe), 0, h+4);
+            gameGrid.add(new ImageView(vPipe), width+1, h+4);
+        }
+        // bottom corners
+        gameGrid.add(new ImageView(bottomLeftPipe), 0, height+4);
+        gameGrid.add(new ImageView(bottomRightPipe), width+1, height+4);
+
+        // for (int h = 0; h < 1; h++) {
+        //     for (int w = 0; w < 1; h++) {
+
+        //     }
+        // }
     }
 
     private void buildNewGame() {
@@ -344,6 +401,17 @@ public class PrimaryController implements Initializable{
         mine = new Image(getClass().getResourceAsStream("/images/mine.png"));
         cover = new Image(getClass().getResourceAsStream("/images/cover.png"));
         flag = new Image(getClass().getResourceAsStream("/images/flag.png"));
+        //border
+        vPipe = new Image(getClass().getResourceAsStream("/images/v_pipe.png"));
+        hPipe = new Image(getClass().getResourceAsStream("/images/h_pipe.png"));
+        topLeftPipe = new Image(getClass().getResourceAsStream("/images/top_left_pipe.png"));
+        topRightPipe = new Image(getClass().getResourceAsStream("/images/top_right_pipe.png"));
+        middleLeftPipe = new Image(getClass().getResourceAsStream("/images/middle_left_pipe.png"));
+        middleRightPipe = new Image(getClass().getResourceAsStream("/images/middle_right_pipe.png"));
+        bottomLeftPipe = new Image(getClass().getResourceAsStream("/images/bottom_left_pipe.png"));
+        bottomRightPipe = new Image(getClass().getResourceAsStream("/images/bottom_right_pipe.png"));
+
+
     }
 
     private void setNewGame() {
