@@ -155,10 +155,6 @@ public class PrimaryController implements Initializable{
                 mineFieldGrid.add(buildMineBox(field[h][w]), w, h);
             }
         }
-        if (mf.getIsFieldClear()) {
-            // yay you won
-            setGameOver();
-        }
     }
 
     private StackPane buildMineBox(MineBox mb) {
@@ -266,6 +262,7 @@ public class PrimaryController implements Initializable{
                     mf.unCoverEmptyBoxes(mb);
                     drawMineGrid();
                 }
+                checkWinStatus();
             }
 
             // middle click release
@@ -296,11 +293,7 @@ public class PrimaryController implements Initializable{
                     }
                 }
                 drawMineGrid();
-            }
-
-            // right click release
-            if (event.getButton() == MouseButton.SECONDARY) {
-                System.out.println("right click release");
+                checkWinStatus();
             }
         });
 
@@ -423,6 +416,13 @@ public class PrimaryController implements Initializable{
 
     private void setNewGame() {
         buildNewGame();
+    }
+
+    private void checkWinStatus() {
+        if (mf.getIsFieldClear()) {
+                    // yay you won
+                    setGameOver();
+                }
     }
 
     @FXML
