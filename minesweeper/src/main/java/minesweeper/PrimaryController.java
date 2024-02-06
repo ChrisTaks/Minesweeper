@@ -15,6 +15,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
 import minesweeper.source_code.*;
 
 public class PrimaryController implements Initializable{
@@ -75,6 +76,13 @@ public class PrimaryController implements Initializable{
     @FXML
     private Pane gameOverPane;
 
+    // TODO: program a win condition
+    // TODO: make the mine you chose on a loss different looking (original has red background)
+    // TODO: get timer working
+    // TODO: get game button picture/game face working (maybe cat faces)
+    // TODO: get number of mines working
+    // TODO: make resize field + number of mines dynamic (user enterable, next to mine number probaby)
+    // TODO: get double click working
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -85,6 +93,7 @@ public class PrimaryController implements Initializable{
         mainPane.getChildren().add(gameGrid);
         mainPane.getChildren().add(newGame);
         mainPane.getChildren().add(mineFieldGrid);
+        mainPane.setBackground(Background.EMPTY);
         mineFieldGrid.relocate(19, 98); // (19*2)+(30*2)
         gameGrid.relocate(0, 0);
         newGame.setOnAction(event -> {
@@ -120,12 +129,6 @@ public class PrimaryController implements Initializable{
         // bottom corners
         gameGrid.add(new ImageView(bottomLeftPipe), 0, height+4);
         gameGrid.add(new ImageView(bottomRightPipe), width+1, height+4);
-
-        // for (int h = 0; h < 1; h++) {
-        //     for (int w = 0; w < 1; h++) {
-
-        //     }
-        // }
     }
 
     private void buildNewGame() {
@@ -151,6 +154,10 @@ public class PrimaryController implements Initializable{
             for (int w = 0; w < mf.getWidth(); w++) {
                 mineFieldGrid.add(buildMineBox(field[h][w]), w, h);
             }
+        }
+        if (mf.getIsFieldClear()) {
+            // yay you won
+            setGameOver();
         }
     }
 

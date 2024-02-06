@@ -5,6 +5,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import javafx.scene.paint.Color;
 
 import java.io.IOException;
 
@@ -17,7 +18,7 @@ public class App extends Application {
 
     @Override
     public void start(Stage stage) throws IOException {
-        scene = new Scene(loadFXML("primary"), 940, 620);
+        scene = new Scene(loadFXML("primary"), 940, 620, Color.BLACK);
         stage.setScene(scene);
         stage.show();
     }

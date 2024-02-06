@@ -237,6 +237,21 @@ public class Field {
         return this.HEIGHT;
     }
 
+    public boolean getIsFieldClear() {
+        int uncovered = 0;
+        for (int h = 0; h < HEIGHT; h++) {
+            for (int w = 0; w < WIDTH; w++) {
+                if (!field[h][w].getIsCovered()) {
+                    uncovered++;
+                }
+            }
+        }
+        if (uncovered == WIDTH * HEIGHT - MINES) {
+            return true;
+        }
+        return false;
+    }
+
     // public static void main(String[] args) {
     //     Field field = new Field();
     //     field.printField();
