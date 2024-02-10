@@ -12,7 +12,10 @@ public class Field {
     private int fieldTotal = 0;
 
 
-    public Field(ArrayList<int[]> fcb) {
+    public Field(int h, int w, int m, ArrayList<int[]> fcb) {
+        setHeight(h);
+        setWidth(w);
+        setMines(m);
         setField();
         populateMines(fcb);
         setMineNumber();
@@ -51,18 +54,24 @@ public class Field {
             while (mineDuplicate) {
                 mineDuplicate = false;
                 mine = rand.nextInt(fieldTotal);
-                //System.out.println("rolled mine: "+mine);
+                System.out.println("rolled mine: "+mine);
                 for (int j = 0; j < mineList.size(); j++) {
                     if (mine == mineList.get(j)) {
                         mineDuplicate = true;
-                        //System.out.println("DUPE FOUND");
+                        System.out.println("DUPE FOUND: "+ mine + " " + fieldTotal);
                     }
                 }
-                for (int j = 0; j < fcb.size(); j++) {
-                    //System.out.println("FCB: "+(((fcb.get(j)[1]) * WIDTH) + (fcb.get(j)[0]))+" Mine: "+mine);
-                    if (mine == ((fcb.get(j)[0] * WIDTH) + fcb.get(j)[1])) {
+                if (MINES < HEIGHT * WIDTH - 1) {
+                    for (int j = 0; j < fcb.size(); j++) {
+                        //System.out.println("FCB: "+(((fcb.get(j)[1]) * WIDTH) + (fcb.get(j)[0]))+" Mine: "+mine);
+                        if (mine == ((fcb.get(j)[0] * WIDTH) + fcb.get(j)[1])) {
+                            mineDuplicate = true;
+                        // System.out.println("Mine equals first click box!");
+                        }
+                    }
+                } else {
+                    if (mine == fcb.get(0)[0] * WIDTH + fcb.get(0)[1]) {
                         mineDuplicate = true;
-                       // System.out.println("Mine equals first click box!");
                     }
                 }
                 //System.out.println("");
@@ -253,6 +262,16 @@ public class Field {
             h = 10;
         }
         this.HEIGHT = h;
+    }
+
+    public void setMines(int m) {
+        if (m < 1) {
+            m = 1;
+        }
+        if (m > HEIGHT * WIDTH) {
+            m = HEIGHT * WIDTH - 1;
+        }
+        this.MINES = m;
     }
 
     public boolean getIsFieldClear() {

@@ -81,6 +81,8 @@ public class PrimaryController implements Initializable{
     private TextField heightBox;
     @FXML
     private TextField widthBox;
+    @FXML
+    private TextField minesBox;
 
     // TODO: make the mine you chose on a loss different looking (original has red background)
     // TODO: get timer working
@@ -97,16 +99,25 @@ public class PrimaryController implements Initializable{
         newGame.setText("New Game");
         heightBox = new TextField();
         heightBox.setPrefWidth(40);
+        heightBox.setText("16");
         widthBox = new TextField();
         widthBox.setPrefWidth(40);
+        widthBox.setText("30");
+        minesBox = new TextField();
+        minesBox.setPrefWidth(40);
+        minesBox.setText("99");
         mainPane.getChildren().add(gameGrid);
         mainPane.getChildren().add(newGame);
         mainPane.getChildren().add(heightBox);
+        mainPane.getChildren().add(widthBox);
+        mainPane.getChildren().add(minesBox);
         mainPane.getChildren().add(mineFieldGrid);
         mainPane.setBackground(Background.EMPTY);
         mineFieldGrid.relocate(19, 98); // (19*2)+(30*2)
         gameGrid.relocate(0, 0);
         heightBox.relocate(90,0);
+        widthBox.relocate(145, 0);
+        minesBox.relocate(200, 0);
         newGame.setOnAction(event -> {
             setNewGame();
         });
@@ -149,7 +160,7 @@ public class PrimaryController implements Initializable{
     
     private void buildMineGrid() {
         OLTiles.clear();
-        mf = new Field(firstClickBoxes);
+        mf = new Field(height, width, mines, firstClickBoxes);
         field = mf.getField();
         mf.printField();
         for (int h = 0; h < mf.getHeight(); h++) {
@@ -223,7 +234,7 @@ public class PrimaryController implements Initializable{
 
             // left click
             if (event.getButton() == MouseButton.PRIMARY) {
-                System.out.println("left click");
+                // System.out.println("left click");
                 if (mb.getIsCovered() && !mb.getIsFlagged()) {
                     mineBox.getChildren().add(clickCover);
                 }
@@ -231,7 +242,7 @@ public class PrimaryController implements Initializable{
 
             // middle click
             if (event.getButton() == MouseButton.MIDDLE) {
-                System.out.println("middle click");
+                // System.out.println("middle click");
                 if (!mb.getIsCovered()) {
                     mb.setIsDoubleClicked(true);
                     ArrayList<MineBox> boxes = mf.getSurroundingTiles(mb);
@@ -244,7 +255,7 @@ public class PrimaryController implements Initializable{
 
             // right click
             if (event.getButton() == MouseButton.SECONDARY) {
-                System.out.println("right click");
+                // System.out.println("right click");
                 if (mb.getIsCovered()) {
                     if (mb.getIsFlagged()) {
                         mineBox.getChildren().remove(flagCover);
@@ -260,7 +271,7 @@ public class PrimaryController implements Initializable{
         mineBox.setOnMouseReleased(event -> {
             // left click release
             if (event.getButton() == MouseButton.PRIMARY) {
-                System.out.println("leftclick release");
+                // System.out.println("leftclick release");
                 if (!mb.getIsFlagged() && mb.getIsCovered()) {
                     mineBox.getChildren().remove(clickCover);
                     mineBox.getChildren().remove(tileCover);
@@ -280,7 +291,7 @@ public class PrimaryController implements Initializable{
 
             // middle click release
             if (event.getButton() == MouseButton.MIDDLE) {
-                System.out.println("middle click release");
+                // System.out.println("middle click release");
                 if (!mb.getIsCovered()) {
                     int flaggedBoxes = 0;
                     mb.setIsDoubleClicked(false);
@@ -355,8 +366,8 @@ public class PrimaryController implements Initializable{
     }
 
     private ArrayList<int[]> getSurroundingTileIndexes(int w, int h) {
-        System.out.println("H: "+h);
-        System.out.println("W: "+w);
+        // System.out.println("H: "+h);
+        // System.out.println("W: "+w);
         ArrayList<int[]> boxes = new ArrayList<int[]>();
         int topRow = h-1;
         int bottomRow = h+1;
@@ -430,6 +441,9 @@ public class PrimaryController implements Initializable{
     }
 
     private void setNewGame() {
+        this.height = Integer.parseInt(heightBox.getText());
+        this.width = Integer.parseInt(widthBox.getText());
+        this.mines = Integer.parseInt(minesBox.getText());
         buildNewGame();
     }
 
