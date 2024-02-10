@@ -11,6 +11,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
@@ -22,8 +23,9 @@ public class PrimaryController implements Initializable{
     private Field mf;
     private MineBox[][] field;
     private ArrayList<int[]> firstClickBoxes = new ArrayList<int[]>();
-    private int width = 30; // og 30
-    private int height = 16; // og 16
+    private int width = 30; // og 30 - expert mode
+    private int height = 16; // og 16 - expert mode
+    private int mines = 99; // og 99 - expert mode
     private ObservableList<StackPane> OLTiles = FXCollections.observableArrayList();
     @FXML
     private GridPane gameGrid = new GridPane();
@@ -75,8 +77,11 @@ public class PrimaryController implements Initializable{
     private Button newGame;
     @FXML
     private Pane gameOverPane;
+    @FXML
+    private TextField heightBox;
+    @FXML
+    private TextField widthBox;
 
-    // TODO: program a win condition
     // TODO: make the mine you chose on a loss different looking (original has red background)
     // TODO: get timer working
     // TODO: get game button picture/game face working (maybe cat faces)
@@ -90,12 +95,18 @@ public class PrimaryController implements Initializable{
         buildNewGame();
         newGame = new Button();
         newGame.setText("New Game");
+        heightBox = new TextField();
+        heightBox.setPrefWidth(40);
+        widthBox = new TextField();
+        widthBox.setPrefWidth(40);
         mainPane.getChildren().add(gameGrid);
         mainPane.getChildren().add(newGame);
+        mainPane.getChildren().add(heightBox);
         mainPane.getChildren().add(mineFieldGrid);
         mainPane.setBackground(Background.EMPTY);
         mineFieldGrid.relocate(19, 98); // (19*2)+(30*2)
         gameGrid.relocate(0, 0);
+        heightBox.relocate(90,0);
         newGame.setOnAction(event -> {
             setNewGame();
         });
@@ -221,12 +232,14 @@ public class PrimaryController implements Initializable{
             // middle click
             if (event.getButton() == MouseButton.MIDDLE) {
                 System.out.println("middle click");
-                mb.setIsDoubleClicked(true);
-                ArrayList<MineBox> boxes = mf.getSurroundingTiles(mb);
-                for (MineBox box : boxes) {
-                    box.setIsDoubleClicked(true);
+                if (!mb.getIsCovered()) {
+                    mb.setIsDoubleClicked(true);
+                    ArrayList<MineBox> boxes = mf.getSurroundingTiles(mb);
+                    for (MineBox box : boxes) {
+                        box.setIsDoubleClicked(true);
+                    }
+                    drawMineGrid();
                 }
-                drawMineGrid();
             }
 
             // right click
@@ -268,32 +281,34 @@ public class PrimaryController implements Initializable{
             // middle click release
             if (event.getButton() == MouseButton.MIDDLE) {
                 System.out.println("middle click release");
-                int flaggedBoxes = 0;
-                mb.setIsDoubleClicked(false);
-                ArrayList<MineBox> boxes = mf.getSurroundingTiles(mb);
-                for (MineBox box : boxes) {
-                    if (box.getIsFlagged()) {
-                        ++flaggedBoxes;
-                    }
-                    box.setIsDoubleClicked(false);
-                }
-                if (flaggedBoxes == mb.getMineNumber() && mb.getMineNumber() != 0) {
+                if (!mb.getIsCovered()) {
+                    int flaggedBoxes = 0;
+                    mb.setIsDoubleClicked(false);
+                    ArrayList<MineBox> boxes = mf.getSurroundingTiles(mb);
                     for (MineBox box : boxes) {
-                        if (!box.getIsFlagged() && box.getIsCovered()) {
-                            box.setIsCovered(false);
-                            if (box.getIsMine()) {
-                                // GAME OVER
-                                setGameOver();
+                        if (box.getIsFlagged()) {
+                            ++flaggedBoxes;
+                        }
+                        box.setIsDoubleClicked(false);
+                    }
+                    if (flaggedBoxes == mb.getMineNumber() && mb.getMineNumber() != 0) {
+                        for (MineBox box : boxes) {
+                            if (!box.getIsFlagged() && box.getIsCovered()) {
+                                box.setIsCovered(false);
+                                if (box.getIsMine()) {
+                                    // GAME OVER
+                                    setGameOver();
+                                }
+                            }
+                            if (box.getMineNumber() == 0) {
+                                // uncover tiles
+                                mf.unCoverEmptyBoxes(box);
                             }
                         }
-                        if (box.getMineNumber() == 0) {
-                            // uncover tiles
-                            mf.unCoverEmptyBoxes(box);
-                        }
                     }
+                    drawMineGrid();
+                    checkWinStatus();
                 }
-                drawMineGrid();
-                checkWinStatus();
             }
         });
 

@@ -6,9 +6,9 @@ import java.util.Random;
 
 public class Field {
     private MineBox[][] field;
-    private final int WIDTH = 30; //OG 30
-    private final int HEIGHT = 16; //OG 16
-    private final int MINES = 99;  //OG 99
+    private int WIDTH = 30; //OG 30 - default for expert
+    private int HEIGHT = 16; //OG 16 - default for expert
+    private int MINES = 99;  //OG 99 - default for expert
     private int fieldTotal = 0;
 
 
@@ -235,6 +235,24 @@ public class Field {
 
     public int getHeight() {
         return this.HEIGHT;
+    }
+
+    public int getMines() {
+        return this.MINES;
+    }
+
+    public void setWidth(int w) {
+        if (w < 10) {
+            w = 10;
+        }
+        this.WIDTH = w;
+    }
+
+    public void setHeight(int h) {
+        if (h < 10) {
+            h = 10;
+        }
+        this.HEIGHT = h;
     }
 
     public boolean getIsFieldClear() {
