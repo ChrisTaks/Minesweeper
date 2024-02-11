@@ -121,7 +121,23 @@ public class PrimaryController implements Initializable{
         newGame.setOnAction(event -> {
             setNewGame();
         });
+    }
 
+    private void setNewGame() {
+        this.height = Integer.parseInt(heightBox.getText());
+        this.width = Integer.parseInt(widthBox.getText());
+        this.mines = Integer.parseInt(minesBox.getText());
+        buildNewGame();
+    }
+
+    private void buildNewGame() {
+        buildBorder();
+        mainPane.getChildren().remove(gameOverPane);
+        buildFacade();
+    }
+
+    private void buildBorder() {
+        gameGrid.getChildren().clear();
         // build the game field
         //very top row
         gameGrid.add(new ImageView(topLeftPipe), 0, 0);
@@ -153,9 +169,32 @@ public class PrimaryController implements Initializable{
         gameGrid.add(new ImageView(bottomRightPipe), width+1, height+4);
     }
 
-    private void buildNewGame() {
-        mainPane.getChildren().remove(gameOverPane);
-        buildFacade();
+    private void buildFacade() {
+        mineFieldGrid.getChildren().clear();
+        for (int h = 0; h < height; h++) {
+            for (int w = 0; w < width; w++) {
+                mineFieldGrid.add(buildFacadeCoverBox(h, w), w, h);
+            }
+        }
+    }
+
+    private ImageView buildFacadeCoverBox(int h, int w) {
+        ImageView fcb = new ImageView(cover);
+        fcb.setOnMousePressed(event -> {
+            if (event.getButton() == MouseButton.PRIMARY) {
+                fcb.setImage(tileImage);
+            }
+        });
+        fcb.setOnMouseReleased(event -> {
+            if (event.getButton() == MouseButton.PRIMARY) {
+                firstClickBoxes = getSurroundingTileIndexes(w, h);
+                mineFieldGrid.getChildren().remove(fcb);
+                buildMineGrid();
+                mf.unCoverEmptyBoxes(mf.getMineBox(h, w));
+                drawMineGrid();
+            }
+        });
+        return fcb;
     }
     
     private void buildMineGrid() {
@@ -338,33 +377,6 @@ public class PrimaryController implements Initializable{
 
     }
 
-    private void buildFacade() {
-        for (int h = 0; h < height; h++) {
-            for (int w = 0; w < width; w++) {
-                mineFieldGrid.add(buildFacadeCoverBox(h, w), w, h);
-            }
-        }
-    }
-
-    private ImageView buildFacadeCoverBox(int h, int w) {
-        ImageView fcb = new ImageView(cover);
-        fcb.setOnMousePressed(event -> {
-            if (event.getButton() == MouseButton.PRIMARY) {
-                fcb.setImage(tileImage);
-            }
-        });
-        fcb.setOnMouseReleased(event -> {
-            if (event.getButton() == MouseButton.PRIMARY) {
-                firstClickBoxes = getSurroundingTileIndexes(w, h);
-                mineFieldGrid.getChildren().remove(fcb);
-                buildMineGrid();
-                mf.unCoverEmptyBoxes(mf.getMineBox(h, w));
-                drawMineGrid();
-            }
-        });
-        return fcb;
-    }
-
     private ArrayList<int[]> getSurroundingTileIndexes(int w, int h) {
         // System.out.println("H: "+h);
         // System.out.println("W: "+w);
@@ -438,13 +450,6 @@ public class PrimaryController implements Initializable{
         bottomRightPipe = new Image(getClass().getResourceAsStream("/images/bottom_right_pipe.png"));
 
 
-    }
-
-    private void setNewGame() {
-        this.height = Integer.parseInt(heightBox.getText());
-        this.width = Integer.parseInt(widthBox.getText());
-        this.mines = Integer.parseInt(minesBox.getText());
-        buildNewGame();
     }
 
     private void checkWinStatus() {

@@ -39,63 +39,46 @@ public class Field {
 
     private void populateMines(ArrayList<int[]> fcb) {
         Random rand = new Random();
-        int minesLeft = MINES;
-        ArrayList<Boolean> tempField = new ArrayList<Boolean>();
-        ArrayList<Integer> mineList = new ArrayList<Integer>();
+
+        ArrayList<Integer> eligibleMines = new ArrayList<Integer>();
         for (int i = 0; i < fieldTotal; i++) {
-            tempField.add(false);
+            eligibleMines.add(i);
+            // System.out.println("i: "+i);
         }
-        //System.out.println("fieldTotal: "+fieldTotal);
-        mineList.add(rand.nextInt(fieldTotal));
-        int mine = 0;
-        for (int i = 0; i < minesLeft; i++) {
-            //mine = fieldTotal+1;
-            boolean mineDuplicate = true;
-            while (mineDuplicate) {
-                mineDuplicate = false;
-                mine = rand.nextInt(fieldTotal);
-                System.out.println("rolled mine: "+mine);
-                for (int j = 0; j < mineList.size(); j++) {
-                    if (mine == mineList.get(j)) {
-                        mineDuplicate = true;
-                        System.out.println("DUPE FOUND: "+ mine + " " + fieldTotal);
-                    }
+        for (int i = 0; i < fcb.size(); i++) {
+            for (int j = 0; j < eligibleMines.size(); j++) {
+                if ((fcb.get(i)[0] * WIDTH) + fcb.get(i)[1] == eligibleMines.get(j)) {
+                    eligibleMines.remove(j);
                 }
-                if (MINES < HEIGHT * WIDTH - 1) {
-                    for (int j = 0; j < fcb.size(); j++) {
-                        //System.out.println("FCB: "+(((fcb.get(j)[1]) * WIDTH) + (fcb.get(j)[0]))+" Mine: "+mine);
-                        if (mine == ((fcb.get(j)[0] * WIDTH) + fcb.get(j)[1])) {
-                            mineDuplicate = true;
-                        // System.out.println("Mine equals first click box!");
+            }
+        }
+        // Note: eligibleMine indexes are not equal to their values!
+        int mine = 0;
+        for (int i = 0; i < MINES; i++) {
+            if (eligibleMines.size() > 0) {
+                mine = rand.nextInt(eligibleMines.size());
+                System.out.println("eligibleMine size: "+eligibleMines.size());
+                for (int h = 0; h < HEIGHT; h++) {
+                    for (int w = 0; w < WIDTH; w++) {
+                        if (eligibleMines.get(mine) == WIDTH * h + w) {
+                            field[h][w].setMine(true);
                         }
                     }
-                } else {
-                    if (mine == fcb.get(0)[0] * WIDTH + fcb.get(0)[1]) {
-                        mineDuplicate = true;
+                }
+                eligibleMines.remove(mine);
+            } else {
+                for (int j = 1; j < fcb.size(); j++) {
+                    if (!field[fcb.get(j)[0]][fcb.get(j)[1]].getIsMine()) {
+                            field[fcb.get(j)[0]][fcb.get(j)[1]].setMine(true);
+                            break;
                     }
                 }
-                //System.out.println("");
-            }
-            mineList.add(mine);
-            //System.out.println("MINE SET: "+mine);
-            tempField.set(mine, true);
-            //minesLeft--;
-        } 
-        //System.out.println("TempFIeld size: "+tempField.size());  
-
-        for (int h = 0; h < HEIGHT; h++) {
-            for (int w = 0; w < WIDTH; w++) {
-                //System.out.println(tempField.get(WIDTH * i + j));
-                if (tempField.get((WIDTH * h) + w)) {
-                    //System.out.println("index "+HEIGHT * j + i+" is a mine");
-                    field[h][w].setMine(true);
-                }
             }
         }
-        // Test print
-        for (int j = 0; j < fcb.size(); j++) {
-            System.out.println("FCB: "+(((fcb.get(j)[0]) * WIDTH) + (fcb.get(j)[1])));
-        }
+        // // Test print
+        // for (int j = 0; j < fcb.size(); j++) {
+        //     System.out.println("FCB: "+(((fcb.get(j)[0]) * WIDTH) + (fcb.get(j)[1])));
+        // }
     }
 
     private void setMineNumber() {
