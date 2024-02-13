@@ -115,9 +115,10 @@ public class PrimaryController implements Initializable{
         mainPane.setBackground(Background.EMPTY);
         mineFieldGrid.relocate(19, 98); // (19*2)+(30*2)
         gameGrid.relocate(0, 0);
-        heightBox.relocate(90,0);
-        widthBox.relocate(145, 0);
-        minesBox.relocate(200, 0);
+        heightBox.relocate(115, 33);
+        widthBox.relocate(170, 33);
+        minesBox.relocate(225, 33);
+        newGame.relocate(25, 33);
         newGame.setOnAction(event -> {
             setNewGame();
         });
