@@ -90,6 +90,7 @@ public class PrimaryController implements Initializable{
     // TODO: get number of mines working
     // TODO: make resize field + number of mines dynamic (user enterable, next to mine number probaby)
     // TODO: get double click working
+    // TODO: make game over box dynamic
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -119,6 +120,14 @@ public class PrimaryController implements Initializable{
         widthBox.relocate(170, 33);
         minesBox.relocate(225, 33);
         newGame.relocate(25, 33);
+        heightBox.setBackground(Background.EMPTY);
+        widthBox.setBackground(Background.EMPTY);
+        minesBox.setBackground(Background.EMPTY);
+        newGame.setBackground(Background.EMPTY);
+        heightBox.setStyle("-fx-text-fill: #5dbcd2; -fx-border-color: #5dbcd2");
+        widthBox.setStyle("-fx-text-fill: #5dbcd2; -fx-border-color: #5dbcd2");
+        minesBox.setStyle("-fx-text-fill: #5dbcd2; -fx-border-color: #5dbcd2");
+        newGame.setStyle("-fx-text-fill: #5dbcd2; -fx-border-color: #5dbcd2");
         newGame.setOnAction(event -> {
             setNewGame();
         });
@@ -375,6 +384,7 @@ public class PrimaryController implements Initializable{
         gameOverPane.setLayoutY(30);
         gameOverPane.setPrefWidth(940);
         gameOverPane.setPrefHeight(620);
+        gameOverPane.relocate(0, 70);
 
     }
 
