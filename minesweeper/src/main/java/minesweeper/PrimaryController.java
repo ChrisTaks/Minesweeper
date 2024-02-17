@@ -83,6 +83,8 @@ public class PrimaryController implements Initializable{
     private TextField widthBox;
     @FXML
     private TextField minesBox;
+    @FXML
+    private AnchorPane mainAnchor;
 
     // TODO: make the mine you chose on a loss different looking (original has red background)
     // TODO: get timer working
@@ -96,6 +98,12 @@ public class PrimaryController implements Initializable{
     public void initialize(URL url, ResourceBundle rb) {
         setImages();
         buildNewGame();
+        mainAnchor = new AnchorPane();
+        mainAnchor.getChildren().add(mainPane);
+        AnchorPane.setTopAnchor(mainPane, 100.0);
+        AnchorPane.setBottomAnchor(mainPane, 100.0);
+        AnchorPane.setLeftAnchor(mainPane, 100.0);
+        AnchorPane.setRightAnchor(mainPane, 100.0);
         newGame = new Button();
         newGame.setText("New Game");
         heightBox = new TextField();
@@ -380,17 +388,14 @@ public class PrimaryController implements Initializable{
         drawMineGrid();
         gameOverPane = new Pane();
         mainPane.getChildren().add(gameOverPane);
-        gameOverPane.setLayoutX(0);
-        gameOverPane.setLayoutY(30);
-        gameOverPane.setPrefWidth(940);
-        gameOverPane.setPrefHeight(620);
-        gameOverPane.relocate(0, 70);
+        gameOverPane.setPrefWidth(30 * width);
+        gameOverPane.setPrefHeight(30 * height);
+        gameOverPane.relocate(19, 96);
+        // gameOverPane.setStyle("-fx-border-color: #5dbcd2"); // for testing
 
     }
 
     private ArrayList<int[]> getSurroundingTileIndexes(int w, int h) {
-        // System.out.println("H: "+h);
-        // System.out.println("W: "+w);
         ArrayList<int[]> boxes = new ArrayList<int[]>();
         int topRow = h-1;
         int bottomRow = h+1;
@@ -465,9 +470,9 @@ public class PrimaryController implements Initializable{
 
     private void checkWinStatus() {
         if (mf.getIsFieldClear()) {
-                    // yay you won
-                    setGameOver();
-                }
+            // yay you won
+            setGameOver();
+        }
     }
 
     @FXML
