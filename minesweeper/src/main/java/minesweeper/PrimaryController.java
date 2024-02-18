@@ -72,6 +72,14 @@ public class PrimaryController implements Initializable{
     @FXML
     private Image bottomRightPipe;
     @FXML
+    private Image neutralFace;
+    @FXML
+    private Image clickFace;
+    @FXML
+    private Image loseFace;
+    @FXML
+    private Image winFace;
+    @FXML
     private Pane mainPane;
     @FXML
     private Button newGame;
@@ -85,6 +93,8 @@ public class PrimaryController implements Initializable{
     private TextField minesBox;
     @FXML
     private AnchorPane mainAnchor;
+    @FXML
+    private StackPane gameFace;
 
     // TODO: make the mine you chose on a loss different looking (original has red background)
     // TODO: get timer working
@@ -99,11 +109,11 @@ public class PrimaryController implements Initializable{
         setImages();
         buildNewGame();
         mainAnchor = new AnchorPane();
-        mainAnchor.getChildren().add(mainPane);
-        AnchorPane.setTopAnchor(mainPane, 100.0);
-        AnchorPane.setBottomAnchor(mainPane, 100.0);
-        AnchorPane.setLeftAnchor(mainPane, 100.0);
-        AnchorPane.setRightAnchor(mainPane, 100.0);
+        // mainAnchor.getChildren().add(mainPane);
+        // AnchorPane.setTopAnchor(mainPane, 100.0);
+        // AnchorPane.setBottomAnchor(mainPane, 100.0);
+        // AnchorPane.setLeftAnchor(mainPane, 100.0);
+        // AnchorPane.setRightAnchor(mainPane, 100.0);
         newGame = new Button();
         newGame.setText("New Game");
         heightBox = new TextField();
@@ -136,6 +146,7 @@ public class PrimaryController implements Initializable{
         widthBox.setStyle("-fx-text-fill: #5dbcd2; -fx-border-color: #5dbcd2");
         minesBox.setStyle("-fx-text-fill: #5dbcd2; -fx-border-color: #5dbcd2");
         newGame.setStyle("-fx-text-fill: #5dbcd2; -fx-border-color: #5dbcd2");
+        initializeGameFace();
         newGame.setOnAction(event -> {
             setNewGame();
         });
@@ -145,6 +156,7 @@ public class PrimaryController implements Initializable{
         this.height = Integer.parseInt(heightBox.getText());
         this.width = Integer.parseInt(widthBox.getText());
         this.mines = Integer.parseInt(minesBox.getText());
+        gameFace.relocate(((width*30))/2, 25);
         buildNewGame();
     }
 
@@ -291,6 +303,7 @@ public class PrimaryController implements Initializable{
 
             // left click
             if (event.getButton() == MouseButton.PRIMARY) {
+                gameFace.getChildren().add(new ImageView(clickFace));
                 // System.out.println("left click");
                 if (mb.getIsCovered() && !mb.getIsFlagged()) {
                     mineBox.getChildren().add(clickCover);
@@ -298,7 +311,8 @@ public class PrimaryController implements Initializable{
             }
 
             // middle click
-            if (event.getButton() == MouseButton.MIDDLE) {
+            if (event.getButton() == MouseButton.MIDDLE) {    
+                gameFace.getChildren().add(new ImageView(clickFace));
                 // System.out.println("middle click");
                 if (!mb.getIsCovered()) {
                     mb.setIsDoubleClicked(true);
@@ -327,6 +341,8 @@ public class PrimaryController implements Initializable{
 
         mineBox.setOnMouseReleased(event -> {
             // left click release
+            gameFace.getChildren().clear();
+            gameFace.getChildren().add(new ImageView(neutralFace));
             if (event.getButton() == MouseButton.PRIMARY) {
                 // System.out.println("leftclick release");
                 if (!mb.getIsFlagged() && mb.getIsCovered()) {
@@ -455,7 +471,7 @@ public class PrimaryController implements Initializable{
         mine = new Image(getClass().getResourceAsStream("/images/mine.png"));
         cover = new Image(getClass().getResourceAsStream("/images/cover.png"));
         flag = new Image(getClass().getResourceAsStream("/images/flag.png"));
-        //border
+        // border
         vPipe = new Image(getClass().getResourceAsStream("/images/v_pipe.png"));
         hPipe = new Image(getClass().getResourceAsStream("/images/h_pipe.png"));
         topLeftPipe = new Image(getClass().getResourceAsStream("/images/top_left_pipe.png"));
@@ -464,6 +480,9 @@ public class PrimaryController implements Initializable{
         middleRightPipe = new Image(getClass().getResourceAsStream("/images/middle_right_pipe.png"));
         bottomLeftPipe = new Image(getClass().getResourceAsStream("/images/bottom_left_pipe.png"));
         bottomRightPipe = new Image(getClass().getResourceAsStream("/images/bottom_right_pipe.png"));
+        // game faces
+        neutralFace = new Image(getClass().getResourceAsStream("/images/neutralFace.png"));
+        clickFace = new Image(getClass().getResourceAsStream("/images/clickFace.png"));
 
 
     }
@@ -473,6 +492,22 @@ public class PrimaryController implements Initializable{
             // yay you won
             setGameOver();
         }
+    }
+
+    private void initializeGameFace() {
+        gameFace = new StackPane();
+        mainPane.getChildren().add(gameFace);
+        gameFace.getChildren().add(new ImageView(neutralFace));
+        gameFace.relocate(((width*30))/2, 25);
+        gameFace.setOnMouseClicked(event -> {
+            //gameFace.getChildren().add(new ImageView(clickedFace));
+        });
+
+        gameFace.setOnMouseReleased(event -> {
+            gameFace.getChildren().clear();
+            gameFace.getChildren().add(new ImageView(neutralFace));
+            setNewGame();
+        });
     }
 
     @FXML
