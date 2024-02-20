@@ -74,9 +74,9 @@ public class MineBox {
     }
 
     public int getMineNumber() {
-        if (isMine) {
-            return 9;    
-        }
+        // if (isMine) {
+        //     return 9;    
+        // }
         return this.mineNumber;
     }
 

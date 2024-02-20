@@ -84,48 +84,52 @@ public class Field {
     private void setMineNumber() {
         for (int i = 0; i < HEIGHT; i++) {
             for (int j = 0; j < WIDTH; j++) {
-                boolean[] mines = new boolean[8];
-                Arrays.fill(mines, false);
-                int topRow = i-1;
-                int bottomRow = i+1;
-                int left = j-1;
-                int right = j+1;
-                // top row
-                if (topRow >= 0) {
-                    mines[1] = field[topRow][j].getIsMine();
+                if (field[i][j].getIsMine()) {
+                    field[i][j].setMineNumber(9);
+                } else {
+                    boolean[] mines = new boolean[8];
+                    Arrays.fill(mines, false);
+                    int topRow = i-1;
+                    int bottomRow = i+1;
+                    int left = j-1;
+                    int right = j+1;
+                    // top row
+                    if (topRow >= 0) {
+                        mines[1] = field[topRow][j].getIsMine();
+                        if (left >= 0) {
+                            mines[0] = field[topRow][left].getIsMine();
+                        }
+                        if (right < WIDTH) {
+                            mines[2] = field[topRow][right].getIsMine();
+                        }
+                    }
+                    // bottow rom
+                    if (bottomRow < HEIGHT) {
+                        mines[5] = field[bottomRow][j].getIsMine();
+                        if (left >= 0) {
+                            mines[6] = field[bottomRow][left].getIsMine();
+                        }
+                        if (right < WIDTH) {
+                            mines[4] = field[bottomRow][right].getIsMine();
+                        }
+                        
+                    }
+                    // middle row
                     if (left >= 0) {
-                        mines[0] = field[topRow][left].getIsMine();
+                        mines[7] = field[i][left].getIsMine();
                     }
                     if (right < WIDTH) {
-                        mines[2] = field[topRow][right].getIsMine();
+                        mines[3] = field[i][right].getIsMine();
                     }
-                }
-                // bottow rom
-                if (bottomRow < HEIGHT) {
-                    mines[5] = field[bottomRow][j].getIsMine();
-                    if (left >= 0) {
-                        mines[6] = field[bottomRow][left].getIsMine();
-                    }
-                    if (right < WIDTH) {
-                        mines[4] = field[bottomRow][right].getIsMine();
-                    }
-                    
-                }
-                // middle row
-                if (left >= 0) {
-                    mines[7] = field[i][left].getIsMine();
-                }
-                if (right < WIDTH) {
-                    mines[3] = field[i][right].getIsMine();
-                }
 
-                int mineNumber = 0;
-                for (int k = 0; k < 8; k++) {
-                    if (mines[k]) {
-                        mineNumber++;
+                    int mineNumber = 0;
+                    for (int k = 0; k < 8; k++) {
+                        if (mines[k]) {
+                            mineNumber++;
+                        }
                     }
+                    field[i][j].setMineNumber(mineNumber);
                 }
-                field[i][j].setMineNumber(mineNumber);
             }
         }
     }

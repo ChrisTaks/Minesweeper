@@ -80,9 +80,9 @@ public class PrimaryController implements Initializable{
     @FXML
     private Image winFace;
     @FXML
-    private Pane mainPane;
+    private Image failCover;
     @FXML
-    private Button newGame;
+    private Pane mainPane;
     @FXML
     private Pane gameOverPane;
     @FXML
@@ -97,12 +97,11 @@ public class PrimaryController implements Initializable{
     private StackPane gameFace;
 
     // TODO: make the mine you chose on a loss different looking (original has red background)
+    // TODO: get number of mines working
     // TODO: get timer working
     // TODO: get game button picture/game face working (maybe cat faces)
-    // TODO: get number of mines working
-    // TODO: make resize field + number of mines dynamic (user enterable, next to mine number probaby)
     // TODO: get double click working
-    // TODO: make game over box dynamic
+    // TODO: make a game pane, move it over and have the field resize boxes next to it (probably vertical)
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -114,8 +113,6 @@ public class PrimaryController implements Initializable{
         // AnchorPane.setBottomAnchor(mainPane, 100.0);
         // AnchorPane.setLeftAnchor(mainPane, 100.0);
         // AnchorPane.setRightAnchor(mainPane, 100.0);
-        newGame = new Button();
-        newGame.setText("New Game");
         heightBox = new TextField();
         heightBox.setPrefWidth(40);
         heightBox.setText("16");
@@ -126,7 +123,6 @@ public class PrimaryController implements Initializable{
         minesBox.setPrefWidth(40);
         minesBox.setText("99");
         mainPane.getChildren().add(gameGrid);
-        mainPane.getChildren().add(newGame);
         mainPane.getChildren().add(heightBox);
         mainPane.getChildren().add(widthBox);
         mainPane.getChildren().add(minesBox);
@@ -137,19 +133,13 @@ public class PrimaryController implements Initializable{
         heightBox.relocate(115, 33);
         widthBox.relocate(170, 33);
         minesBox.relocate(225, 33);
-        newGame.relocate(25, 33);
         heightBox.setBackground(Background.EMPTY);
         widthBox.setBackground(Background.EMPTY);
         minesBox.setBackground(Background.EMPTY);
-        newGame.setBackground(Background.EMPTY);
         heightBox.setStyle("-fx-text-fill: #5dbcd2; -fx-border-color: #5dbcd2");
         widthBox.setStyle("-fx-text-fill: #5dbcd2; -fx-border-color: #5dbcd2");
         minesBox.setStyle("-fx-text-fill: #5dbcd2; -fx-border-color: #5dbcd2");
-        newGame.setStyle("-fx-text-fill: #5dbcd2; -fx-border-color: #5dbcd2");
         initializeGameFace();
-        newGame.setOnAction(event -> {
-            setNewGame();
-        });
     }
 
     private void setNewGame() {
@@ -284,6 +274,10 @@ public class PrimaryController implements Initializable{
             case 9:
                 number.setImage(mine);
                 break;
+            case 10:
+                number.setImage(failCover);
+                System.out.println("failCover added");
+                break;
         }
         mineBox.getChildren().add(number);
         ImageView tileCover = new ImageView(cover);
@@ -351,6 +345,9 @@ public class PrimaryController implements Initializable{
                     mb.setIsCovered(false);
                     if (mb.getIsMine()) {
                         // GAME OVER
+                        //mineBox.getChildren().clear();
+                        mb.setMineNumber(10); // 10 = failCover mine
+                        System.out.println("game over");
                         setGameOver();
                     }
                 }
@@ -483,6 +480,8 @@ public class PrimaryController implements Initializable{
         // game faces
         neutralFace = new Image(getClass().getResourceAsStream("/images/neutralFace.png"));
         clickFace = new Image(getClass().getResourceAsStream("/images/clickFace.png"));
+        // failCover
+        failCover = new Image(getClass().getResourceAsStream("/images/failCover.png"));
 
 
     }
