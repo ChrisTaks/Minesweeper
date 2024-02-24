@@ -108,37 +108,42 @@ public class PrimaryController implements Initializable{
         setImages();
         buildNewGame();
         mainAnchor = new AnchorPane();
-        // mainAnchor.getChildren().add(mainPane);
-        // AnchorPane.setTopAnchor(mainPane, 100.0);
-        // AnchorPane.setBottomAnchor(mainPane, 100.0);
-        // AnchorPane.setLeftAnchor(mainPane, 100.0);
-        // AnchorPane.setRightAnchor(mainPane, 100.0);
-        heightBox = new TextField();
-        heightBox.setPrefWidth(40);
-        heightBox.setText("16");
-        widthBox = new TextField();
-        widthBox.setPrefWidth(40);
-        widthBox.setText("30");
-        minesBox = new TextField();
-        minesBox.setPrefWidth(40);
-        minesBox.setText("99");
         mainPane.getChildren().add(gameGrid);
-        mainPane.getChildren().add(heightBox);
-        mainPane.getChildren().add(widthBox);
-        mainPane.getChildren().add(minesBox);
         mainPane.getChildren().add(mineFieldGrid);
         mainPane.setBackground(Background.EMPTY);
         mineFieldGrid.relocate(19, 98); // (19*2)+(30*2)
         gameGrid.relocate(0, 0);
-        heightBox.relocate(115, 33);
-        widthBox.relocate(170, 33);
-        minesBox.relocate(225, 33);
+        // mainAnchor.getChildren().add(mainPane);
+        
+        // temp fix for a "bug" that makes heightBox text highlighted when program runs
+        Button noHighlight = new Button();
+        mainPane.getChildren().add(noHighlight);
+        noHighlight.setBackground(Background.EMPTY);
+        // heightBox
+        heightBox = new TextField();
+        mainPane.getChildren().add(heightBox);
         heightBox.setBackground(Background.EMPTY);
-        widthBox.setBackground(Background.EMPTY);
-        minesBox.setBackground(Background.EMPTY);
         heightBox.setStyle("-fx-text-fill: #5dbcd2; -fx-border-color: #5dbcd2");
+        heightBox.setPrefWidth(40);
+        heightBox.setText("16");
+        heightBox.relocate(30, 33);
+        // widthBox
+        widthBox = new TextField();
+        mainPane.getChildren().add(widthBox);
+        widthBox.setBackground(Background.EMPTY);
         widthBox.setStyle("-fx-text-fill: #5dbcd2; -fx-border-color: #5dbcd2");
+        widthBox.setPrefWidth(40);
+        widthBox.setText("30");
+        widthBox.relocate(85, 33);
+        // minesBox
+        minesBox = new TextField();
+        mainPane.getChildren().add(minesBox);
+        minesBox.setBackground(Background.EMPTY);
         minesBox.setStyle("-fx-text-fill: #5dbcd2; -fx-border-color: #5dbcd2");
+        minesBox.setPrefWidth(40);
+        minesBox.setText("99");
+        minesBox.relocate(140, 33);
+        // gameFace (cat face) 
         initializeGameFace();
     }
 
