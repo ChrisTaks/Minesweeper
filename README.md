@@ -17,7 +17,8 @@ https://mzrg.com/js/mbm/
 
 ***
 I figured it would be too easy to look up a tutorial so I decided to challenge myself somewhat with some rules.
-Rules:
+
+**Rules:**
 - No minesweeper specific tutorials
 - Other tutorials allowed (like tetris, for general knowledge on how to program a game)
 - Outside help allowed (only advice)
